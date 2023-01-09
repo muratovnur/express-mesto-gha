@@ -3,7 +3,12 @@ const User = require('../models/user');
 
 const getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
+    .then((users) => {
+      const usersFormatted = users.map((user) => ({
+        name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
+      }));
+      res.status(200).send(usersFormatted);
+    })
     .catch(() => {
       res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
@@ -20,7 +25,7 @@ const getUserById = (req, res) => {
       // Если пользователь не найден user.name вызовет ошибку TypeError,
       // поскольку user будет undefined
       if (err instanceof TypeError || err instanceof mongoose.Error.CastError) {
-        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+        res.status(400).send({ message: 'Пользователь по указанному _id не найден.' });
         return;
       }
       res.status(500).send({ message: 'На сервере произошла ошибка' });
@@ -48,14 +53,14 @@ const updateUserProfile = async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
     { ...req.body },
-    { new: true },
+    { new: true, runValidators: true },
   ).then((user) => {
     res.status(200).send({
       name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
     });
   }).catch((err) => {
     if (err instanceof mongoose.Error.ValidationError) {
-      res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
       return;
     }
 

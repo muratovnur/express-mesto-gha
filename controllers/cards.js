@@ -3,7 +3,17 @@ const Card = require('../models/card');
 
 const getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.send(cards))
+    .then((cards) => {
+      const cardsFormatted = cards.map((card) => ({
+        name: card.name,
+        link: card.link,
+        likes: card.likes,
+        owner: card.owner,
+        createdAt: card.createdAt,
+        _id: card._id,
+      }));
+      res.status(200).send(cardsFormatted);
+    })
     .catch(() => {
       res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
@@ -15,12 +25,12 @@ const createCard = (req, res) => {
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
       res.send({
-        _id: card._id,
         name: card.name,
         link: card.link,
         likes: card.likes,
         owner: card.owner,
         createdAt: card.createdAt,
+        _id: card._id,
       });
     })
     .catch((err) => {
@@ -37,12 +47,12 @@ const deleteCard = async (req, res) => {
   await Card.findByIdAndDelete(req.params.cardId)
     .then((card) => {
       res.send({
-        _id: card._id,
         name: card.name,
         link: card.link,
         likes: card.likes,
         owner: card.owner,
         createdAt: card.createdAt,
+        _id: card._id,
       });
     })
     .catch((err) => {
@@ -61,12 +71,12 @@ const likeCard = (req, res) => Card.findByIdAndUpdate(
   { new: true },
 ).then((card) => {
   res.send({
-    _id: card._id,
     name: card.name,
     link: card.link,
     likes: card.likes,
     owner: card.owner,
     createdAt: card.createdAt,
+    _id: card._id,
   });
 }).catch((err) => {
   if (err instanceof mongoose.Error.ValidationError) {
@@ -75,7 +85,7 @@ const likeCard = (req, res) => Card.findByIdAndUpdate(
   }
 
   if (err instanceof TypeError || err instanceof mongoose.Error.CastError) {
-    res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+    res.status(400).send({ message: 'Передан несуществующий _id карточки.' });
     return;
   }
 
@@ -88,12 +98,12 @@ const dislikeCard = (req, res) => Card.findByIdAndUpdate(
   { new: true },
 ).then((card) => {
   res.send({
-    _id: card._id,
     name: card.name,
     link: card.link,
     likes: card.likes,
     owner: card.owner,
     createdAt: card.createdAt,
+    _id: card._id,
   });
 }).catch((err) => {
   if (err instanceof mongoose.Error.ValidationError) {
@@ -102,7 +112,7 @@ const dislikeCard = (req, res) => Card.findByIdAndUpdate(
   }
 
   if (err instanceof TypeError || err instanceof mongoose.Error.CastError) {
-    res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+    res.status(400).send({ message: 'Передан несуществующий _id карточки.' });
     return;
   }
 
