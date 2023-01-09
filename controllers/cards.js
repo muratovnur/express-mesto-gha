@@ -27,7 +27,7 @@ const createCard = (req, res) => {
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
-      res.send({
+      res.status(OK).send({
         name: card.name,
         link: card.link,
         likes: card.likes,
@@ -49,7 +49,7 @@ const createCard = (req, res) => {
 const deleteCard = async (req, res) => {
   await Card.findByIdAndDelete(req.params.cardId)
     .then((card) => {
-      res.send({
+      res.status(OK).send({
         name: card.name,
         link: card.link,
         likes: card.likes,
@@ -78,7 +78,7 @@ const likeCard = (req, res) => Card.findByIdAndUpdate(
   { $addToSet: { likes: req.user._id } },
   { new: true },
 ).then((card) => {
-  res.send({
+  res.status(OK).send({
     name: card.name,
     link: card.link,
     likes: card.likes,
@@ -105,7 +105,7 @@ const dislikeCard = (req, res) => Card.findByIdAndUpdate(
   { $pull: { likes: req.user._id } },
   { new: true },
 ).then((card) => {
-  res.send({
+  res.status(OK).send({
     name: card.name,
     link: card.link,
     likes: card.likes,
