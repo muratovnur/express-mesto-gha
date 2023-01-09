@@ -5,6 +5,7 @@ const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 
 const app = express();
+const { NOT_FOUND } = require('./utils/constants');
 
 // При записи адреса как localhost возникала ошибка.
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
@@ -23,6 +24,6 @@ app.use((req, res, next) => {
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 
-app.use('/', (req, res) => res.status(404).send({ message: 'Страница не найдена.' }));
+app.use('/', (req, res) => res.status(NOT_FOUND).send({ message: 'Страница не найдена.' }));
 
-app.listen(3000, () => console.log('Server is running on port 3000'));
+app.listen(3000);
