@@ -22,10 +22,15 @@ const getUserById = (req, res) => {
       });
     })
     .catch((err) => {
+      // Если передан некорректный _id произойдет CastError перед пойском пользователя
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(400).send({ message: 'Передан некорректный _id пользователя.' });
+        return;
+      }
       // Если пользователь не найден user.name вызовет ошибку TypeError,
-      // поскольку user будет undefined
-      if (err instanceof TypeError || err instanceof mongoose.Error.CastError) {
-        res.status(400).send({ message: 'Пользователь по указанному _id не найден.' });
+      // поскольку user будет null
+      if (err instanceof TypeError) {
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
         return;
       }
       res.status(500).send({ message: 'На сервере произошла ошибка' });

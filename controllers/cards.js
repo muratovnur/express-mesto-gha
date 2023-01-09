@@ -56,7 +56,12 @@ const deleteCard = async (req, res) => {
       });
     })
     .catch((err) => {
-      if (err instanceof TypeError || err instanceof mongoose.Error.CastError) {
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(400).send({ message: 'Переданы некорректные данные для удаления карточки.' });
+        return;
+      }
+
+      if (err instanceof TypeError) {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
         return;
       }
@@ -79,13 +84,13 @@ const likeCard = (req, res) => Card.findByIdAndUpdate(
     _id: card._id,
   });
 }).catch((err) => {
-  if (err instanceof mongoose.Error.ValidationError) {
+  if (err instanceof mongoose.Error.CastError) {
     res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
     return;
   }
 
-  if (err instanceof TypeError || err instanceof mongoose.Error.CastError) {
-    res.status(400).send({ message: 'Передан несуществующий _id карточки.' });
+  if (err instanceof TypeError) {
+    res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
     return;
   }
 
@@ -106,13 +111,13 @@ const dislikeCard = (req, res) => Card.findByIdAndUpdate(
     _id: card._id,
   });
 }).catch((err) => {
-  if (err instanceof mongoose.Error.ValidationError) {
+  if (err instanceof mongoose.Error.CastError) {
     res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
     return;
   }
 
-  if (err instanceof TypeError || err instanceof mongoose.Error.CastError) {
-    res.status(400).send({ message: 'Передан несуществующий _id карточки.' });
+  if (err instanceof TypeError) {
+    res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
     return;
   }
 
