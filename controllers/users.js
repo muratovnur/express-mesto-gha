@@ -28,15 +28,15 @@ const getUserById = (req, res) => {
       // Если передан некорректный _id произойдет CastError перед пойском пользователя
       if (err instanceof mongoose.Error.CastError) {
         res.status(INVALID_DATA).send({ message: 'Передан некорректный _id пользователя.' });
-        return;
       }
       // Если пользователь не найден user.name вызовет ошибку TypeError,
       // поскольку user будет null
-      if (err instanceof TypeError) {
+      else if (err instanceof TypeError) {
         res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
-        return;
       }
-      res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      else {
+        res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      }
     });
 };
 
@@ -51,9 +51,10 @@ const createUser = (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         res.status(INVALID_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-        return;
       }
-      res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      else {
+        res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      }
     });
 };
 
@@ -69,15 +70,13 @@ const updateUserProfile = async (req, res) => {
   }).catch((err) => {
     if (err instanceof mongoose.Error.ValidationError) {
       res.status(INVALID_DATA).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
-      return;
     }
-
-    if (err instanceof TypeError || err instanceof mongoose.Error.CastError) {
+    else if (err instanceof TypeError || err instanceof mongoose.Error.CastError) {
       res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
-      return;
     }
-
-    res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+    else {
+      res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+    }
   });
 };
 
@@ -85,23 +84,21 @@ const updateUserAvatar = async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
     { avatar: req.body.avatar },
-    { new: true },
+    { new: true, runValidators: true },
   ).then((user) => {
     res.status(OK).send({
       name: user.name, about: user.about, avatar: user.avatar, _id: user._id,
     });
   }).catch((err) => {
     if (err instanceof mongoose.Error.ValidationError) {
-      res.status(INVALID_DATA).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      return;
+      res.status(INVALID_DATA).send({ message: 'Переданы некорректные данные при обновлений аватара' });
     }
-
-    if (err instanceof TypeError || err instanceof mongoose.Error.CastError) {
+    else if (err instanceof TypeError || err instanceof mongoose.Error.CastError) {
       res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
-      return;
     }
-
-    res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+    else {
+      res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+    }
   });
 };
 

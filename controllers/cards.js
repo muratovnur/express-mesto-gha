@@ -39,10 +39,10 @@ const createCard = (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         res.status(INVALID_DATA).send({ message: 'Переданы некорректные данные при создании карточки.' });
-        return;
       }
-
-      res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      else {
+        res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      }
     });
 };
 
@@ -61,15 +61,13 @@ const deleteCard = async (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         res.status(INVALID_DATA).send({ message: 'Переданы некорректные данные для удаления карточки.' });
-        return;
       }
-
-      if (err instanceof TypeError) {
+      else if (err instanceof TypeError) {
         res.status(NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена.' });
-        return;
       }
-
-      res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      else {
+        res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+      }
     });
 };
 
@@ -89,15 +87,13 @@ const likeCard = (req, res) => Card.findByIdAndUpdate(
 }).catch((err) => {
   if (err instanceof mongoose.Error.CastError) {
     res.status(INVALID_DATA).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
-    return;
   }
-
-  if (err instanceof TypeError) {
+  else if (err instanceof TypeError) {
     res.status(NOT_FOUND).send({ message: 'Передан несуществующий _id карточки.' });
-    return;
   }
-
-  res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+  else {
+    res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+  }
 });
 
 const dislikeCard = (req, res) => Card.findByIdAndUpdate(
@@ -116,15 +112,13 @@ const dislikeCard = (req, res) => Card.findByIdAndUpdate(
 }).catch((err) => {
   if (err instanceof mongoose.Error.CastError) {
     res.status(INVALID_DATA).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
-    return;
   }
-
-  if (err instanceof TypeError) {
+  else if (err instanceof TypeError) {
     res.status(NOT_FOUND).send({ message: 'Передан несуществующий _id карточки.' });
-    return;
   }
-
-  res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+  else {
+    res.status(BAD_SERVER_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+  }
 });
 
 module.exports = {
