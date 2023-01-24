@@ -6,7 +6,7 @@ const jwtVerify = (req, res, next) => {
   const token = req.cookies.jwt;
 
   if (!token) {
-    next(new UnauthorizedError('Необходима авторизация'));
+    next(new UnauthorizedError('Необходима авторизация.'));
   }
   else {
     let payload;
@@ -18,7 +18,7 @@ const jwtVerify = (req, res, next) => {
       next();
     }
     catch (err) {
-      next(new UnauthorizedError('Необходима авторизация'));
+      next(new UnauthorizedError('Необходима авторизация.'));
     }
   }
 };
