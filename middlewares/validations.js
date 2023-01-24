@@ -1,5 +1,6 @@
 const { celebrate, Joi } = require('celebrate');
 const { ObjectId } = require('mongoose').Types;
+const { REGEX_FOR_URL } = require('../utils/constants');
 
 const validateGetUserById = celebrate({
   params: Joi.object().keys({
@@ -16,7 +17,12 @@ const validateCreateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string(),
+    avatar: Joi.string().custom((value, helpers) => {
+      if (REGEX_FOR_URL.test(value)) {
+        return value;
+      }
+      return helpers.message({ message: 'Невалидный url для аватара.' });
+    }),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
