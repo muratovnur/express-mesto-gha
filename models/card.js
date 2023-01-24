@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
+const { REGEX_FOR_URL } = require('../utils/constants');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -12,8 +12,7 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      // без default возникает ошибка: validator.isUrl() is not a function
-      validator: (v) => validator.default.isURL(v),
+      validator: (value) => REGEX_FOR_URL.test(value),
       message: 'Некорректный URL',
     },
   },
