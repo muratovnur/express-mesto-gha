@@ -37,7 +37,12 @@ const validateUpdateUserProfile = celebrate({
 
 const validateUpdateUserAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().uri(),
+    avatar: Joi.string().custom((value, helpers) => {
+      if (REGEX_FOR_URL.test(value)) {
+        return value;
+      }
+      return helpers.message({ message: 'Невалидный url для аватара.' });
+    }),
   }),
 });
 
@@ -51,7 +56,12 @@ const validateLogin = celebrate({
 const validateCreateCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().uri(),
+    link: Joi.string().required().custom((value, helpers) => {
+      if (REGEX_FOR_URL.test(value)) {
+        return value;
+      }
+      return helpers.message({ message: 'Невалидный url для изображения карточки.' });
+    }),
   }),
 });
 
