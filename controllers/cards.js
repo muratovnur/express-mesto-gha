@@ -48,12 +48,12 @@ const createCard = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
-      if (req.user._id !== card.owner.toString()) {
-        return Promise.reject(new ForbiddenError('Удаление чужой карточки запрещено.'));
-      }
-
       if (!card) {
         throw new NotFoundError('Карточка с указанным _id не найдена.');
+      }
+
+      if (req.user._id !== card.owner.toString()) {
+        return Promise.reject(new ForbiddenError('Удаление чужой карточки запрещено.'));
       }
 
       card.delete();
