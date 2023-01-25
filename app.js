@@ -8,7 +8,8 @@ const cardsRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const { validateCreateUser, validateLogin } = require('./middlewares/validations');
 const { jwtVerify } = require('./middlewares/auth');
-const { NOT_FOUND } = require('./utils/constants');
+const { handleErrors } = require('./middlewares/error-handler');
+const { NotFoundError } = require('./errors/not-found-error');
 
 const app = express();
 
@@ -28,20 +29,10 @@ app.use(jwtVerify);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 
-app.use('/', (req, res) => res.status(NOT_FOUND).send({ message: 'Страница не найдена.', params: req.params }));
+app.use('/', (req, res, next) => next(new NotFoundError('По указанному пути ничего не найдено.')));
 
 app.use(errors());
 
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-});
+app.use(handleErrors);
 
 app.listen(3000);

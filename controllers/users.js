@@ -25,6 +25,10 @@ const getUsers = (req, res, next) => {
 const getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь по указанному _id не найден.');
+      }
+
       res.status(OK).send({
         name: user.name,
         about: user.about,
@@ -37,9 +41,6 @@ const getUserInfo = (req, res, next) => {
       if (err instanceof mongoose.Error.CastError) {
         next(new BadRequestError('Передан некорректный _id пользователя.'));
       }
-      else if (err instanceof TypeError) {
-        next(new NotFoundError('Пользователь по указанному _id не найден.'));
-      }
       else {
         next(err);
       }
@@ -49,6 +50,10 @@ const getUserInfo = (req, res, next) => {
 const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь по указанному _id не найден.');
+      }
+
       res.status(OK).send({
         name: user.name,
         about: user.about,
@@ -61,11 +66,6 @@ const getUserById = (req, res, next) => {
       // Если передан некорректный _id произойдет CastError перед пойском пользователя
       if (err instanceof mongoose.Error.CastError) {
         next(new BadRequestError('Передан некорректный _id пользователя.'));
-      }
-      // Если пользователь не найден user.name вызовет ошибку TypeError,
-      // поскольку user будет null
-      else if (err instanceof TypeError) {
-        next(new NotFoundError('Пользователь по указанному _id не найден.'));
       }
       else {
         next(err);
@@ -92,10 +92,7 @@ const createUser = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (err instanceof BadRequestError) {
-        next(err);
-      }
-      else if (err instanceof mongoose.Error.ValidationError) {
+      if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
       }
       else if (err.code === 11000) {
@@ -113,6 +110,10 @@ const updateUserProfile = async (req, res, next) => {
     { ...req.body },
     { new: true, runValidators: true },
   ).then((user) => {
+    if (!user) {
+      throw new NotFoundError('Пользователь по указанному _id не найден.');
+    }
+
     res.status(OK).send({
       name: user.name,
       about: user.about,
@@ -121,11 +122,8 @@ const updateUserProfile = async (req, res, next) => {
       _id: user._id,
     });
   }).catch((err) => {
-    if (err instanceof mongoose.Error.ValidationError) {
+    if (err instanceof mongoose.Error.ValidationError || err instanceof mongoose.Error.CastError) {
       next(new BadRequestError('Переданы некорректные данные при обновлении профиля.'));
-    }
-    else if (err instanceof TypeError || err instanceof mongoose.Error.CastError) {
-      next(new NotFoundError('Пользователь по указанному _id не найден.'));
     }
     else {
       next(err);
@@ -139,6 +137,10 @@ const updateUserAvatar = async (req, res, next) => {
     { avatar: req.body.avatar },
     { new: true, runValidators: true },
   ).then((user) => {
+    if (!user) {
+      throw new NotFoundError('Пользователь по указанному _id не найден.');
+    }
+
     res.status(OK).send({
       name: user.name,
       about: user.about,
@@ -147,11 +149,8 @@ const updateUserAvatar = async (req, res, next) => {
       _id: user._id,
     });
   }).catch((err) => {
-    if (err instanceof mongoose.Error.ValidationError) {
+    if (err instanceof mongoose.Error.ValidationError || err instanceof mongoose.Error.CastError) {
       next(new BadRequestError('Переданы некорректные данные при обновлений аватара'));
-    }
-    else if (err instanceof TypeError || err instanceof mongoose.Error.CastError) {
-      next(new NotFoundError('Пользователь по указанному _id не найден.'));
     }
     else {
       next(err);

@@ -52,6 +52,10 @@ const deleteCard = (req, res, next) => {
         return Promise.reject(new ForbiddenError('Удаление чужой карточки запрещено.'));
       }
 
+      if (!card) {
+        throw new NotFoundError('Карточка с указанным _id не найдена.');
+      }
+
       card.delete();
 
       return res.status(OK).send({
@@ -67,9 +71,6 @@ const deleteCard = (req, res, next) => {
       if (err instanceof mongoose.Error.CastError) {
         next(new BadRequestError('Переданы некорректные данные для удаления карточки.'));
       }
-      else if (err instanceof TypeError) {
-        next(new NotFoundError('Карточка с указанным _id не найдена.'));
-      }
       else {
         next(err);
       }
@@ -81,6 +82,10 @@ const likeCard = (req, res, next) => Card.findByIdAndUpdate(
   { $addToSet: { likes: req.user._id } },
   { new: true },
 ).then((card) => {
+  if (!card) {
+    throw new NotFoundError('Карточка с указанным _id не найдена.');
+  }
+
   res.status(OK).send({
     name: card.name,
     link: card.link,
@@ -92,9 +97,6 @@ const likeCard = (req, res, next) => Card.findByIdAndUpdate(
 }).catch((err) => {
   if (err instanceof mongoose.Error.CastError) {
     next(new BadRequestError('Переданы некорректные данные для постановки/снятии лайка.'));
-  }
-  else if (err instanceof TypeError) {
-    next(new NotFoundError('Передан несуществующий _id карточки.'));
   }
   else {
     next(err);
@@ -106,6 +108,10 @@ const dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
   { $pull: { likes: req.user._id } },
   { new: true },
 ).then((card) => {
+  if (!card) {
+    throw new NotFoundError('Карточка с указанным _id не найдена.');
+  }
+
   res.status(OK).send({
     name: card.name,
     link: card.link,
@@ -117,9 +123,6 @@ const dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
 }).catch((err) => {
   if (err instanceof mongoose.Error.CastError) {
     next(new BadRequestError('Переданы некорректные данные для постановки/снятии лайка.'));
-  }
-  else if (err instanceof TypeError) {
-    next(new NotFoundError('Передан несуществующий _id карточки.'));
   }
   else {
     next(err);
